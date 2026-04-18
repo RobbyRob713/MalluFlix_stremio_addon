@@ -4,7 +4,7 @@ const axios = require("axios");
 const TMDB_KEY = "b8e31efed6de570178942a39601e84b0";
 
 const manifest = {
-    id: "org.mallu.flix.forza",
+    id: "org.mallu.flix",
     version: "3.0.0",
     name: "MalluFlix",
     description: "Malayalam movie catalog using TMDB discovery + Cinemeta compatibility",
