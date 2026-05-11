@@ -17,6 +17,12 @@ const manifest = {
             id: "malluflix_catalog",
             name: "MalluFlix New Releases",
             extra: [{ name: "search" }, { name: "skip" }]
+        },
+        {
+            type: "movie",
+            id: "malluflix_ott",
+            name: "MalluFlix OTT Released",
+            extra: [{ name: "search" }, { name: "skip" }]
         }
     ],
     idPrefixes: ["tt"]
@@ -60,22 +66,34 @@ async function tmdbToImdb(tmdbId) {
 
 /* Malayalam Catalog */
 builder.defineCatalogHandler(async ({ type, id, extra }) => {
-    if (type !== "movie" || id !== "malluflix_catalog") return { metas: [] };
+    if (type !== "movie" || !["malluflix_catalog", "malluflix_ott"].includes(id)) return { metas: [] };
 
     const skip = extra?.skip ? parseInt(extra.skip) : 0;
     const page = Math.round(skip / 20) + 1;
     const today = new Date().toISOString().split('T')[0];
 
+    const params = {
+        api_key: TMDB_KEY,
+        with_original_language: "ml",
+        sort_by: "primary_release_date.desc",
+    };
+
+    if (id === "malluflix_ott") {
+        // Filter for Digital releases (4) in India
+        params["release_date.lte"] = today;
+        params.with_release_type = "4|5"; // 4 = Digital, 5 = Physical
+        params.region = "IN";
+        params.sort_by = "release_date.desc";
+    } else {
+        // Default: All Malayalam releases
+        params["primary_release_date.lte"] = today;
+        params.sort_by = "primary_release_date.desc";
+    }
+
     // Fetch 3 pages to ensure sufficient content
     const promises = [page, page + 1, page + 2].map(p =>
         fetchWithCache("https://api.themoviedb.org/3/discover/movie", {
-            params: {
-                api_key: TMDB_KEY,
-                with_original_language: "ml",
-                "primary_release_date.lte": today,
-                sort_by: "primary_release_date.desc",
-                page: p
-            }
+            params: { ...params, page: p }
         })
     );
 
