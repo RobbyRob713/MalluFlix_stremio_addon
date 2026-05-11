@@ -8,7 +8,7 @@ const manifest = {
     version: "3.0.0",
     name: "MalluFlix",
     description: "Malayalam movie catalog using TMDB discovery + Cinemeta compatibility",
-    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBciJKrh7BJiY6U1UKbCedjqBdd9_AQai7-Q&s",
+    logo: "https://forzayt.github.io/MalluFlix_stremio_addon/images/logo.jpg",
     resources: ["catalog", "meta"],
     types: ["movie"],
     catalogs: [
