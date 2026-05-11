@@ -15,13 +15,25 @@ const manifest = {
         {
             type: "movie",
             id: "malluflix_catalog",
-            name: "MalluFlix New Releases",
+            name: "MalluFlix In Theaters",
             extra: [{ name: "search" }, { name: "skip" }]
         },
         {
             type: "movie",
             id: "malluflix_ott",
             name: "MalluFlix OTT Released",
+            extra: [{ name: "search" }, { name: "skip" }]
+        },
+        {
+            type: "movie",
+            id: "malluflix_comedy",
+            name: "MalluFlix Comedy",
+            extra: [{ name: "search" }, { name: "skip" }]
+        },
+        {
+            type: "movie",
+            id: "malluflix_horror",
+            name: "MalluFlix Horror",
             extra: [{ name: "search" }, { name: "skip" }]
         }
     ],
@@ -66,7 +78,7 @@ async function tmdbToImdb(tmdbId) {
 
 /* Malayalam Catalog */
 builder.defineCatalogHandler(async ({ type, id, extra }) => {
-    if (type !== "movie" || !["malluflix_catalog", "malluflix_ott"].includes(id)) return { metas: [] };
+    if (type !== "movie" || !["malluflix_catalog", "malluflix_ott", "malluflix_comedy", "malluflix_horror"].includes(id)) return { metas: [] };
 
     const skip = extra?.skip ? parseInt(extra.skip) : 0;
     const page = Math.round(skip / 20) + 1;
@@ -84,6 +96,16 @@ builder.defineCatalogHandler(async ({ type, id, extra }) => {
         params.with_release_type = "4|5"; // 4 = Digital, 5 = Physical
         params.region = "IN";
         params.sort_by = "release_date.desc";
+    } else if (id === "malluflix_comedy") {
+        // Filter for Comedy genre (35)
+        params["primary_release_date.lte"] = today;
+        params.with_genres = "35";
+        params.sort_by = "primary_release_date.desc";
+    } else if (id === "malluflix_horror") {
+        // Filter for Horror genre (27)
+        params["primary_release_date.lte"] = today;
+        params.with_genres = "27";
+        params.sort_by = "primary_release_date.desc";
     } else {
         // Default: All Malayalam releases
         params["primary_release_date.lte"] = today;
