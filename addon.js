@@ -37,9 +37,9 @@ async function getTmdbData(url, params) {
 }
 
 const manifest = {
-    id: "metaverse",
+    id: "malluflix",
     version: "1.0.0",
-    name: "Metaverse",
+    name: "MalluFlix",
     description: "The only Metadata addon for stremio",
     logo: "https://forzayt.github.io/MalluFlix_stremio_addon/images/logo.png",
     resources: ["catalog", "meta"],
@@ -47,118 +47,119 @@ const manifest = {
     catalogs: [
         {
             type: "movie",
+            id: "malluflix_catalog",
+            name: "MalluFlix Malayalam",
+            extra: [{ name: "search" }, { name: "skip" }]
+        },
+        {
+            type: "movie",
             id: "popular_movies",
-            name: "Metaverse Popular",
+            name: "MalluFlix Popular",
             posterShape: "landscape",
             extra: [{ name: "search" }, { name: "skip" }]
         },
         {
             type: "series",
             id: "popular_series",
-            name: "Metaverse Popular",
+            name: "MalluFlix Popular",
             extra: [{ name: "search" }, { name: "skip" }]
         },
        
         {
             type: "movie",
             id: "netflix_movies",
-            name: "Metaverse Netflix",
+            name: "MalluFlix Netflix",
             extra: [{ name: "search" }, { name: "skip" }]
         },
         {
             type: "series",
             id: "netflix_series",
-            name: "Metaverse Netflix",
+            name: "MalluFlix Netflix",
             extra: [{ name: "search" }, { name: "skip" }]
         },
         {
             type: "movie",
             id: "prime_movies",
-            name: "Metaverse Prime Video",
+            name: "MalluFlix Prime Video",
             extra: [{ name: "search" }, { name: "skip" }]
         },
         {
             type: "series",
             id: "prime_series",
-            name: "Metaverse Prime Video",
+            name: "MalluFlix Prime Video",
             extra: [{ name: "search" }, { name: "skip" }]
         },
         {
             type: "movie",
             id: "apple_movies",
-            name: "Metaverse Apple TV+",
+            name: "MalluFlix Apple TV+",
             extra: [{ name: "search" }, { name: "skip" }]
         },
         {
             type: "series",
             id: "apple_series",
-            name: "Metaverse Apple TV+",
+            name: "MalluFlix Apple TV+",
             extra: [{ name: "search" }, { name: "skip" }]
         },
          {
             type: "movie",
             id: "marvel_movies",
-            name: "Metaverse Marvel",
+            name: "MalluFlix Marvel",
             extra: [{ name: "search" }, { name: "skip" }]
         },
         {
             type: "movie",
             id: "dc_movies",
-            name: "Metaverse DC",
+            name: "MalluFlix DC",
             extra: [{ name: "search" }, { name: "skip" }]
         },
         {
             type: "movie",
             id: "hulu_movies",
-            name: "Metaverse Hulu",
+            name: "MalluFlix Hulu",
             extra: [{ name: "search" }, { name: "skip" }]
         },
         {
             type: "series",
             id: "hulu_series",
-            name: "Metaverse Hulu",
+            name: "MalluFlix Hulu",
             extra: [{ name: "search" }, { name: "skip" }]
         },
         {
             type: "movie",
             id: "sony_movies",
-            name: "Metaverse SonyLIV",
+            name: "MalluFlix SonyLIV",
             extra: [{ name: "search" }, { name: "skip" }]
         },
         {
             type: "series",
             id: "sony_series",
-            name: "Metaverse SonyLIV",
+            name: "MalluFlix SonyLIV",
             extra: [{ name: "search" }, { name: "skip" }]
         },
         {
             type: "movie",
             id: "zee_movies",
-            name: "Metaverse Zee5",
+            name: "MalluFlix Zee5",
             extra: [{ name: "search" }, { name: "skip" }]
         },
         {
             type: "series",
             id: "zee_series",
-            name: "Metaverse Zee5",
+            name: "MalluFlix Zee5",
             extra: [{ name: "search" }, { name: "skip" }]
         },
-        {
-            type: "movie",
-            id: "metaverse_catalog",
-            name: "Metaverse Malayalam",
-            extra: [{ name: "search" }, { name: "skip" }]
-        },
+        
         {
             type: "movie",
             id: "tamil_movies",
-            name: "Metaverse Tamil",
+            name: "MalluFlix Tamil",
             extra: [{ name: "search" }, { name: "skip" }]
         },
         {
             type: "movie",
             id: "hindi_movies",
-            name: "Metaverse Hindi",
+            name: "MalluFlix Hindi",
             extra: [{ name: "search" }, { name: "skip" }]
         }
     ],
