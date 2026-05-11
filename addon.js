@@ -268,9 +268,9 @@ builder.defineCatalogHandler(async ({ type, id, extra }) => {
             page: page
         }) || {};
         results = data.results || [];
-    } else if (id === "metaverse_catalog" || id === "tamil_movies" || id === "hindi_movies") {
+    } else if (id === "malluflix_catalog" || id === "tamil_movies" || id === "hindi_movies") {
         const languages = {
-            "metaverse_catalog": "ml",
+            "malluflix_catalog": "ml",
             "tamil_movies": "ta",
             "hindi_movies": "hi"
         };
