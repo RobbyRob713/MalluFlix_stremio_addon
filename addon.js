@@ -15,7 +15,7 @@ const manifest = {
         {
             type: "movie",
             id: "malluflix_catalog",
-            name: "MalluFlix Malayalam",
+            name: "MalluFlix New Releases",
             extra: [{ name: "search" }, { name: "skip" }]
         }
     ],
@@ -24,14 +24,35 @@ const manifest = {
 
 const builder = new addonBuilder(manifest);
 
+const CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 1 day in milliseconds
+const cache = new Map();
+
+async function fetchWithCache(url, config = {}) {
+    const key = url + JSON.stringify(config.params || {});
+    const cached = cache.get(key);
+
+    if (cached && (Date.now() - cached.timestamp < CACHE_EXPIRY)) {
+        console.log(`Cache hit for: ${url}`);
+        return cached.data;
+    }
+
+    console.log(`Cache miss for: ${url}. Fetching...`);
+    const response = await axios.get(url, config);
+    cache.set(key, {
+        data: response.data,
+        timestamp: Date.now()
+    });
+    return response.data;
+}
+
 /* Convert TMDB → IMDb ID */
 async function tmdbToImdb(tmdbId) {
     try {
-        const res = await axios.get(
+        const data = await fetchWithCache(
             `https://api.themoviedb.org/3/movie/${tmdbId}/external_ids`,
             { params: { api_key: TMDB_KEY } }
         );
-        return res.data.imdb_id;
+        return data.imdb_id;
     } catch {
         return null;
     }
@@ -47,7 +68,7 @@ builder.defineCatalogHandler(async ({ type, id, extra }) => {
 
     // Fetch 3 pages to ensure sufficient content
     const promises = [page, page + 1, page + 2].map(p =>
-        axios.get("https://api.themoviedb.org/3/discover/movie", {
+        fetchWithCache("https://api.themoviedb.org/3/discover/movie", {
             params: {
                 api_key: TMDB_KEY,
                 with_original_language: "ml",
@@ -59,7 +80,7 @@ builder.defineCatalogHandler(async ({ type, id, extra }) => {
     );
 
     const responses = await Promise.all(promises);
-    const results = responses.flatMap(r => r.data.results || []);
+    const results = responses.flatMap(r => r.results || []);
 
     // Process items in chunks to avoid hitting API rate limits (429)
     const batchSize = 5;
@@ -90,10 +111,10 @@ builder.defineCatalogHandler(async ({ type, id, extra }) => {
 builder.defineMetaHandler(async ({ type, id }) => {
     if (type !== "movie") return { meta: null };
 
-    const res = await axios.get(
+    const data = await fetchWithCache(
         `https://v3-cinemeta.strem.io/meta/movie/${id}.json`
     );
-    return res.data;
+    return { meta: data.meta || data };
 });
 
 module.exports = builder.getInterface();
