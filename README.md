@@ -1,139 +1,145 @@
+# 🎬 Metaverse – The Ultimate Metadata Addon for Stremio
+
+Metaverse is a comprehensive metadata discovery addon for Stremio, designed to provide high-quality movie and series information from various streaming platforms and regional cinema. It bridges the gap between discovery and playback by providing a rich browsing experience.
 
 
-
-# 🎬 MalluFlix – Malayalam Movie Catalog Addon for Stremio
-
-MalluFlix is a lightweight **Malayalam-only discovery addon** for Stremio.
-It uses TMDB for identifying Malayalam films and Cinemeta for official Stremio-compatible metadata, allowing other streaming addons to automatically attach available streams.
-
-> **MalluFlix does NOT host, store, or distribute any video content.**
+> **Metaverse does NOT host, store, or distribute any video content.** It is a metadata-only provider that works alongside your existing streaming addons.
 
 ---
 
 ## ✨ Features
 
-* 🇮🇳 Malayalam-only movie catalog
-* 🔍 Powered by TMDB language discovery
-* 🔗 Fully compatible with all Stremio streaming addons
-* ⚡ Infinite scroll with stable pagination
-* 🧠 Automatic IMDb ID resolution for ecosystem-native behavior
-* 🚫 No scraping, no illegal content, no file hosting
+* 🚀 **Multi-Platform Catalogs**: Discovery content from Netflix, Amazon Prime, Apple TV+, Hulu, and more in one place.
+* 🎥 **Regional Cinema Support**: Dedicated catalogs for **Malayalam**, **Tamil**, and **Hindi** movies.
+* 🎭 **Specialized Collections**: Handpicked catalogs for Marvel, DC, SonyLIV, and Zee5.
+* 🔍 **Unified Search**: Integrated search functionality across all supported catalogs.
+* ⚡ **Infinite Scroll**: Smooth browsing experience with stable pagination using TMDB data.
+* 🖼 **Premium Posters**: Integrated support for RPDB (Poster DB) for high-resolution, consistent artwork.
+* 🧠 **IMDb Ecosystem**: Native behavior using IMDb ID resolution, ensuring compatibility with all major streaming addons.
+* 💾 **Smart Caching**: In-memory caching for TMDB requests to ensure lightning-fast responses and stay within API limits.
 
 ---
 
+![Metaverse Demo](https://forzayt.github.io/Metaverse_Stremio_Addon/images/demo.png)
+
+
 ## 🧱 How It Works
+
+Metaverse acts as a "Catalog & Meta" provider. When you browse a catalog in Stremio:
+
+1. **Request**: Stremio requests a catalog (e.g., "Metaverse Tamil") from the addon.
+2. **Discovery**: The addon queries TMDB using specialized filters (language, provider, company).
+3. **Enhancement**: Metadata is fetched and enhanced with IMDb IDs and premium posters (via RPDB).
+4. **Delivery**: A list of "Meta" objects is sent back to Stremio.
+5. **Playback**: When you click a movie, Stremio uses the IMDb ID provided by Metaverse to find streams from *other* addons you have installed (like Torrentio, Orion, etc.).
 
 ```
 Stremio App
     ↓
-MalluFlix Addon
+Metaverse Addon (Catalog & Meta)
     ↓
-TMDB (find Malayalam movies)
+TMDB / RPDB (Fetch Data)
     ↓
-IMDb ID mapping
+Metaverse Returns IMDb IDs
     ↓
-Cinemeta (official Stremio metadata)
+Stremio asks Stream Addons
     ↓
-Other Streaming Addons attach streams automatically
+Playback Begins 🎬
 ```
-
-MalluFlix only provides **catalog & metadata**, never streams.
 
 ---
 
-## 🛠 Installation
+## 📂 Supported Catalogs
 
-1. Clone the repository
-2. Install dependencies:
+| Category | Catalogs Included |
+| --- | --- |
+| **Streaming Giants** | Netflix, Prime Video, Apple TV+, Hulu |
+| **Regional Cinema** | Malayalam, Tamil, Hindi |
+| **Studios & Networks** | Marvel, DC, SonyLIV, Zee5 |
+| **Global Hits** | Popular Movies, Popular Series |
 
-```bash
-npm install
-```
+---
 
-3. Add your TMDB API key in the source file:
+## 🛠 Installation & Setup
 
-```js
-const TMDB_KEY = "YOUR_TMDB_API_KEY";
-```
+### 1. Prerequisites
+* [Node.js](https://nodejs.org/) (v14 or higher).
+* [TMDB API Key](https://www.themoviedb.org/documentation/api) (Required).
+* [RPDB API Key](https://posterdb.cc/) (Recommended for best experience).
 
-4. Start the addon:
+### 2. Local Setup
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/forzayt/Metaverse_Stremio_Addon.git
+   cd Metaverse_Stremio_Addon
+   ```
 
-```bash
-node index.js
-```
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-5. Open in browser:
+3. **Configure Environment**:
+   Create a `.env` file in the root:
+   ```env
+   TMDB_KEY=your_tmdb_api_key
+   RPDB_KEY=your_rpdb_api_key
+   PORT=7000
+   ```
 
-```
-http://localhost:7000/manifest.json
-```
+4. **Start the Addon**:
+   ```bash
+   npm start
+   ```
 
-6. Install it into Stremio.
-``` 
-https://malluflix-forzayt-stremio.onrender.com/
-```
+### 3. Usage in Stremio
+* Open Stremio.
+* Go to the **Addons** section.
+* Paste your manifest URL: `http://localhost:7000/manifest.json` (or your deployed URL).
+* Click **Install**.
 
+---
 
-## 📦 Endpoints
+## 📦 Technical Architecture
 
-| Endpoint                                | Purpose                     |
-| --------------------------------------- | --------------------------- |
-| `/manifest.json`                        | Addon metadata              |
-| `/catalog/movie/malluflix_catalog.json` | Malayalam movie list        |
-| `/meta/movie/{imdb_id}.json`            | Movie metadata via Cinemeta |
+* **Runtime**: Node.js with Express.js.
+* **SDK**: `stremio-addon-sdk` for seamless integration.
+* **Data Sources**:
+    * **TMDB**: Core metadata, discovery, and search.
+    * **Cinemeta**: Fallback metadata for detailed views.
+    * **RPDB**: Premium poster artwork.
+* **Optimization**: 
+    * Concurrent API processing in batches.
+    * Time-based memory caching for discovery results.
+    * Automated API error handling and cleanups.
 
 ---
 
 ## ⚖ Legal Disclaimer
 
-MalluFlix:
+Metaverse:
+* ❌ Does **NOT** host or distribute copyrighted media.
+* ❌ Does **NOT** scrape or index illegal sources.
+* ❌ Does **NOT** provide streaming URLs or torrent links.
+* ✅ Only aggregates **public metadata** via official APIs.
 
-* ❌ Does NOT host or distribute copyrighted media
-* ❌ Does NOT scrape or index illegal sources
-* ❌ Does NOT provide streaming URLs
-* ✅ Only aggregates **public metadata**
-* ✅ Uses official APIs (TMDB, Cinemeta)
-
-All trademarks, movie posters, and metadata belong to their respective owners.
-
-The user is solely responsible for any third-party addons they install alongside MalluFlix.
-
----
-
-## 🧑‍⚖ Responsibility
-
-This project exists only as a **catalog & metadata enhancer**.
-
-Any media streams displayed inside Stremio are supplied by **external addons** that the user installs separately.
-MalluFlix has **no control over third-party stream sources**.
+All trademarks, movie posters, and metadata belong to their respective owners. Metaverse is a tool for metadata organization and discovery only.
 
 ---
 
 ## 🤝 Contributing
 
-Pull requests are welcome.
-
-Suggested improvements:
-
-* Malayalam keyword detection refinement
-* Local caching
-* Performance optimizations
-
----
-
-## 🧠 Credits
-
-* [TMDB](https://www.themoviedb.org/)
-* [Stremio Cinemeta](https://github.com/Stremio/stremio-addons)
-* Stremio Addon SDK
+Contributions are what make the open-source community amazing! 
+1. Fork the Project.
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`).
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`).
+4. Push to the Branch (`git push origin feature/AmazingFeature`).
+5. Open a Pull Request.
 
 ---
 
-## ❤️ Support
+## ❤️ Support & Community
 
-If you enjoy this project, you can support development via
-**Buy Me A Coffee** ☕ on the [website](https://malluflix-forzayt-stremio.onrender.com/).
-
----
-
-
+If you find this project useful, consider supporting the development.
+* **Website**: [Metaverse Landing Page](https://metaverse-addon.onrender.com)
+* **GitHub**: [Star this Repo](https://github.com/forzayt/Metaverse_Stremio_Addon)

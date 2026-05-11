@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const { getRouter } = require("stremio-addon-sdk");
 const addonInterface = require("./addon");

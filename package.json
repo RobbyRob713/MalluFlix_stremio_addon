@@ -1,13 +1,14 @@
 {
-  "name": "malluflix-addon",
+  "name": "metaverse",
   "version": "1.0.0",
-  "description": "Base Stremio addon for MalluFlix",
+  "description": "The Metaverse Stremio Addon",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "stremio-addon-sdk": "^1.1.0",
-    "axios": "^1.6.0"
+    "axios": "^1.16.0",
+    "dotenv": "^17.4.2",
+    "stremio-addon-sdk": "^1.1.0"
   }
 }
