@@ -45,12 +45,6 @@ const manifest = {
     resources: ["catalog", "meta", "stream"],
     types: ["movie"],
     catalogs: [
-        ...(hasUrl ? [{
-            type: "movie",
-            id: "malluflix_streams",
-            name: "MalluFlix Direct Streams",
-            extra: [{ name: "search" }, { name: "skip" }]
-        }] : []),
         {
             type: "movie",
             id: "malluflix_catalog",
@@ -74,7 +68,13 @@ const manifest = {
             id: `malluflix_genre_${name.toLowerCase().replace(/\s+/g, '_')}`,
             name: `MalluFlix ${name}`,
             extra: [{ name: "search" }, { name: "skip" }]
-        }))
+        })),
+        ...(hasUrl ? [{
+            type: "movie",
+            id: "malluflix_streams",
+            name: "MalluFlix Direct Streams",
+            extra: [{ name: "search" }, { name: "skip" }]
+        }] : [])
     ],
     idPrefixes: ["tt", "malluflix_"]
 };
