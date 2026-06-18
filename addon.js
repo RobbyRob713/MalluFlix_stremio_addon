@@ -1,5 +1,7 @@
 const { addonBuilder } = require("stremio-addon-sdk");
 const axios = require("axios");
+const fs = require("fs");
+const path = require("path");
 
 const TMDB_KEY = "b8e31efed6de570178942a39601e84b0";
 
@@ -21,15 +23,34 @@ const GENRES = {
     "Thriller": 53
 };
 
+// Check if urls.json has a valid URL
+const urlsPath = path.join(__dirname, "urls.json");
+let urlsData = {};
+try {
+    if (fs.existsSync(urlsPath)) {
+        urlsData = JSON.parse(fs.readFileSync(urlsPath, "utf8"));
+    }
+} catch (e) {
+    console.error("Error reading urls.json", e);
+}
+
+const hasUrl = urlsData && urlsData.url && urlsData.url.trim() !== "";
+
 const manifest = {
     id: "org.mallu.flix",
     version: "3.0.0",
     name: "MalluFlix",
     description: "Malayalam movie catalog using TMDB discovery + Cinemeta compatibility",
     logo: "https://forzayt.github.io/MalluFlix_stremio_addon/images/logo.jpg",
-    resources: ["catalog", "meta"],
+    resources: ["catalog", "meta", "stream"],
     types: ["movie"],
     catalogs: [
+        ...(hasUrl ? [{
+            type: "movie",
+            id: "malluflix_streams",
+            name: "MalluFlix Direct Streams",
+            extra: [{ name: "search" }, { name: "skip" }]
+        }] : []),
         {
             type: "movie",
             id: "malluflix_catalog",
@@ -55,7 +76,7 @@ const manifest = {
             extra: [{ name: "search" }, { name: "skip" }]
         }))
     ],
-    idPrefixes: ["tt"]
+    idPrefixes: ["tt", "malluflix_"]
 };
 
 const builder = new addonBuilder(manifest);
@@ -96,6 +117,19 @@ async function tmdbToImdb(tmdbId) {
 
 /* Malayalam Catalog */
 builder.defineCatalogHandler(async ({ type, id, extra }) => {
+    if (id === "malluflix_streams") {
+        if (!hasUrl) return { metas: [] };
+        return {
+            metas: [{
+                id: "malluflix_direct_stream",
+                type: "movie",
+                name: "MalluFlix Direct Stream",
+                poster: "https://forzayt.github.io/MalluFlix_stremio_addon/images/logo.jpg",
+                description: "Direct play from urls.json"
+            }]
+        };
+    }
+
     const isGenreCatalog = id.startsWith("malluflix_genre_");
     if (type !== "movie" || (!["malluflix_catalog", "malluflix_ott", "malluflix_future"].includes(id) && !isGenreCatalog)) return { metas: [] };
 
@@ -174,10 +208,39 @@ builder.defineCatalogHandler(async ({ type, id, extra }) => {
 builder.defineMetaHandler(async ({ type, id }) => {
     if (type !== "movie") return { meta: null };
 
+    if (id === "malluflix_direct_stream") {
+        return {
+            meta: {
+                id: "malluflix_direct_stream",
+                type: "movie",
+                name: "MalluFlix Direct Stream",
+                poster: "https://forzayt.github.io/MalluFlix_stremio_addon/images/logo.jpg",
+                description: "Direct play from urls.json",
+                background: "https://forzayt.github.io/MalluFlix_stremio_addon/images/logo.jpg"
+            }
+        };
+    }
+
     const data = await fetchWithCache(
         `https://v3-cinemeta.strem.io/meta/movie/${id}.json`
     );
     return { meta: data.meta || data };
+});
+
+/* Stream Handler */
+builder.defineStreamHandler(async ({ type, id }) => {
+    if (type !== "movie" || id !== "malluflix_direct_stream") return { streams: [] };
+
+    if (hasUrl) {
+        return {
+            streams: [{
+                title: "MalluFlix Direct Stream",
+                url: urlsData.url
+            }]
+        };
+    }
+
+    return { streams: [] };
 });
 
 module.exports = builder.getInterface();
