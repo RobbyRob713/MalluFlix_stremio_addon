@@ -1,13 +1,35 @@
 {
   "name": "malluflix-addon",
-  "version": "1.0.0",
-  "description": "Base Stremio addon for MalluFlix",
-  "main": "server.js",
+  "version": "2.0.0",
+  "description": "Metadata-only Malayalam movie catalog addon for Stremio",
+  "main": "dist/server.js",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "start": "node server.js"
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json",
+    "test": "vitest run"
   },
   "dependencies": {
-    "stremio-addon-sdk": "^1.1.0",
-    "axios": "^1.6.0"
+    "axios": "^1.18.1",
+    "dotenv": "^17.2.1",
+    "express": "^5.2.1",
+    "stremio-addon-sdk": "^1.6.10"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.1.1",
+    "@types/supertest": "^6.0.3",
+    "supertest": "^7.1.4",
+    "tsx": "^4.23.1",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "fsevents@2.3.3": true
   }
 }

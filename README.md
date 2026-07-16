@@ -1,139 +1,148 @@
+## MalluFlix
 
+MalluFlix is a metadata-only Stremio addon for Malayalam movies. It uses TMDB discovery to build Malayalam catalogs and resolves final Stremio metadata through Cinemeta by IMDb ID.
 
+It does not host or stream video content.
 
-# 🎬 MalluFlix – Malayalam Movie Catalog Addon for Stremio
+## Features
 
-MalluFlix is a lightweight **Malayalam-only discovery addon** for Stremio.
-It uses TMDB for identifying Malayalam films and Cinemeta for official Stremio-compatible metadata, allowing other streaming addons to automatically attach available streams.
+- Movie-only addon
+- Malayalam discovery via TMDB
+- Cinemeta-backed metadata via IMDb IDs
+- Catalogs for new releases, OTT releases, future releases, and genres
+- In-process TTL cache for TMDB and Cinemeta responses
+- Render-friendly Node service with environment-only configuration
 
-> **MalluFlix does NOT host, store, or distribute any video content.**
+## Runtime
 
----
+- Node 20 LTS
+- Express
+- TypeScript
 
-## ✨ Features
+## Configuration
 
-* 🇮🇳 Malayalam-only movie catalog
-* 🔍 Powered by TMDB language discovery
-* 🔗 Fully compatible with all Stremio streaming addons
-* ⚡ Infinite scroll with stable pagination
-* 🧠 Automatic IMDb ID resolution for ecosystem-native behavior
-* 🚫 No scraping, no illegal content, no file hosting
+Copy `.env.example` to `.env` for local development and set:
 
----
-
-## 🧱 How It Works
-
-```
-Stremio App
-    ↓
-MalluFlix Addon
-    ↓
-TMDB (find Malayalam movies)
-    ↓
-IMDb ID mapping
-    ↓
-Cinemeta (official Stremio metadata)
-    ↓
-Other Streaming Addons attach streams automatically
+```bash
+PORT=7000
+TMDB_API_KEY=your_tmdb_api_key
+CACHE_TTL_MS=86400000
+BASE_URL=https://your-render-service.onrender.com
 ```
 
-MalluFlix only provides **catalog & metadata**, never streams.
+Notes:
 
----
+- `TMDB_API_KEY` is required at startup.
+- `PORT` defaults to `7000`.
+- `CACHE_TTL_MS` defaults to `86400000`.
+- `BASE_URL` is optional for local development.
+- `BASE_URL` is intended to be the public hosted URL for cross-device installs, not a LAN `http://192.168.x.x` address.
 
-## 🛠 Installation
-
-1. Clone the repository
-2. Install dependencies:
+## Local Setup
 
 ```bash
 npm install
+npm run dev
 ```
 
-3. Add your TMDB API key in the source file:
-
-```js
-const TMDB_KEY = "YOUR_TMDB_API_KEY";
-```
-
-4. Start the addon:
+For a production-style run:
 
 ```bash
-node index.js
+npm run build
+npm start
 ```
 
-5. Open in browser:
+## Install Paths
 
+There are two supported install flows.
+
+### 1. Same-machine local install
+
+Use this when Stremio and the addon server are running on the same Mac or PC.
+
+```text
+http://127.0.0.1:7000/manifest.json
 ```
-http://localhost:7000/manifest.json
+
+The landing page also exposes:
+
+```text
+stremio://127.0.0.1:7000/manifest.json
 ```
 
-6. Install it into Stremio.
-``` 
-https://malluflix-forzayt-stremio.onrender.com/
+Local verification:
+
+1. Start the service with a valid `TMDB_API_KEY`.
+2. Open `http://127.0.0.1:7000/manifest.json` and confirm the manifest loads.
+3. Open `http://127.0.0.1:7000/` and use the localhost install or copy-manifest action.
+4. In desktop Stremio on the same machine, add the addon from the local manifest URL.
+5. Confirm the movie catalogs load and a movie detail page resolves metadata.
+
+### 2. Cross-device hosted HTTPS install
+
+Use this for Android, TV, web clients, or any device that is not running the addon server locally.
+
+Expected manifest form:
+
+```text
+https://your-render-service.onrender.com/manifest.json
 ```
 
+Render checklist:
 
-## 📦 Endpoints
+- Set `TMDB_API_KEY`
+- Set `BASE_URL=https://your-render-service.onrender.com`
+- Use `https://your-render-service.onrender.com/manifest.json` in Stremio
 
-| Endpoint                                | Purpose                     |
-| --------------------------------------- | --------------------------- |
-| `/manifest.json`                        | Addon metadata              |
-| `/catalog/movie/malluflix_catalog.json` | Malayalam movie list        |
-| `/meta/movie/{imdb_id}.json`            | Movie metadata via Cinemeta |
+If `BASE_URL` is missing or not HTTPS, the landing page will show a hosted-install warning instead of a cross-device install button.
 
----
+## Important Install Note
 
-## ⚖ Legal Disclaimer
+Plain HTTP LAN URLs such as `http://192.168.x.x:7000/manifest.json` may open in a browser but can still fail in Stremio with `Unable to fetch`. MalluFlix no longer treats LAN HTTP as a recommended install target.
 
-MalluFlix:
+## API Surface
 
-* ❌ Does NOT host or distribute copyrighted media
-* ❌ Does NOT scrape or index illegal sources
-* ❌ Does NOT provide streaming URLs
-* ✅ Only aggregates **public metadata**
-* ✅ Uses official APIs (TMDB, Cinemeta)
+- `GET /manifest.json`
+- `GET /catalog/movie/malluflix_catalog.json`
+- `GET /catalog/movie/malluflix_ott.json`
+- `GET /catalog/movie/malluflix_future.json`
+- `GET /catalog/movie/malluflix_genre_<genre>.json`
+- `GET /meta/movie/<imdb_id>.json`
 
-All trademarks, movie posters, and metadata belong to their respective owners.
+The manifest exposes only `catalog` and `meta` resources. Stream resources are intentionally not provided.
 
-The user is solely responsible for any third-party addons they install alongside MalluFlix.
+## Render Deployment
 
----
+Use these settings on Render:
 
-## 🧑‍⚖ Responsibility
+- Build command: `npm install && npm run build`
+- Start command: `npm start`
+- Required env vars: `TMDB_API_KEY`
+- Optional env vars: `PORT`, `CACHE_TTL_MS`, `BASE_URL`
 
-This project exists only as a **catalog & metadata enhancer**.
+Recommended hosted URL:
 
-Any media streams displayed inside Stremio are supplied by **external addons** that the user installs separately.
-MalluFlix has **no control over third-party stream sources**.
+```text
+https://your-render-service.onrender.com
+```
 
----
+## Troubleshooting
 
-## 🤝 Contributing
+- If startup fails immediately, confirm `.env` is loaded and `TMDB_API_KEY` is present.
+- If the server does not start on `7000`, another process may already be using the port.
+- If a LAN URL works in a browser but Stremio shows `Unable to fetch`, switch to `127.0.0.1` for same-machine installs or deploy to public HTTPS.
+- If manifest assets still point to `127.0.0.1`, check whether `BASE_URL` is set correctly in the hosted environment.
 
-Pull requests are welcome.
+## Development Commands
 
-Suggested improvements:
+```bash
+npm run dev
+npm run build
+npm start
+npm run typecheck
+npm run test
+```
 
-* Malayalam keyword detection refinement
-* Local caching
-* Performance optimizations
+## Legal
 
----
-
-## 🧠 Credits
-
-* [TMDB](https://www.themoviedb.org/)
-* [Stremio Cinemeta](https://github.com/Stremio/stremio-addons)
-* Stremio Addon SDK
-
----
-
-## ❤️ Support
-
-If you enjoy this project, you can support development via
-**Buy Me A Coffee** ☕ on the [website](https://malluflix-forzayt-stremio.onrender.com/).
-
----
-
-
+MalluFlix only aggregates public metadata from TMDB and Cinemeta. It does not provide, store, or distribute media streams. Any streams shown in Stremio come from other addons installed by the user.
