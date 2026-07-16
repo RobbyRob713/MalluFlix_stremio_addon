@@ -57,6 +57,7 @@ describe("HTTP endpoints", () => {
     const response = await request(app).get("/manifest.json");
 
     expect(response.status).toBe(200);
+    expect(response.headers["access-control-allow-origin"]).toBe("*");
     expect(response.body.resources).toEqual(["catalog", "meta"]);
     expect(response.body.logo).toBe("http://127.0.0.1:7000/images/logo.jpg");
   });

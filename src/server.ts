@@ -54,6 +54,10 @@ export function createApp(
   app.disable("x-powered-by");
   app.set("trust proxy", true);
   app.use(requestLogger(logger));
+  app.use((_, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    next();
+  });
   app.use("/images", express.static(imagesDir));
   app.use(express.static(publicDir));
 
