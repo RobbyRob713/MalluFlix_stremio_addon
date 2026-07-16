@@ -9,7 +9,15 @@ const config: AppConfig = {
   port: 7000,
   tmdbApiKey: "test-key",
   cacheTtlMs: 1000,
-  baseUrl: "http://127.0.0.1:7000"
+  baseUrl: "http://127.0.0.1:7000",
+  addon: {
+    key: "malluflix",
+    id: "org.mallu.flix",
+    name: "MalluFlix",
+    description: "Metadata-only Malayalam movie catalogs powered by TMDB and Cinemeta.",
+    contentLanguage: "ml",
+    contentLabel: "Malayalam"
+  }
 };
 
 const logger: Logger = {
@@ -94,6 +102,7 @@ describe("HTTP endpoints", () => {
     expect(appConfig.local.manifestUrl).toBe("http://127.0.0.1:7000/manifest.json");
     expect(appConfig.hosted.manifestUrl).toBe("https://malluflix.example.com/manifest.json");
     expect(appConfig.hosted.isAvailable).toBe(true);
+    expect(appConfig.addon.name).toBe("MalluFlix");
   });
 
   it("serves /app-config.js in local-only mode when BASE_URL is missing", async () => {

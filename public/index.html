@@ -3,10 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>MalluFlix</title>
+    <title>MovieFlix Addon</title>
     <meta
+      id="meta-description"
       name="description"
-      content="Metadata-only Malayalam movie catalog addon for Stremio."
+      content="Metadata-only movie catalog addon for Stremio."
     />
     <link rel="stylesheet" href="/app.css" />
     <script defer src="/app-config.js"></script>
@@ -16,11 +17,8 @@
     <main class="shell">
       <section class="hero">
         <p class="eyebrow">STREMIO ADDON</p>
-        <h1>MalluFlix</h1>
-        <p class="lede">
-          Malayalam movie discovery for Stremio, built from TMDB catalogs and
-          resolved through Cinemeta. Metadata only. No streams.
-        </p>
+        <h1 id="addon-name">MovieFlix</h1>
+        <p id="addon-lede" class="lede">Metadata-only movie discovery for Stremio. No streams.</p>
         <p class="hero-note">
           Same machine: use <code>127.0.0.1</code>. Other devices: use a public
           <code>https://.../manifest.json</code> deployment.
@@ -68,7 +66,7 @@
       <section class="grid">
         <article class="card">
           <h2>Catalogs</h2>
-          <p>New releases, OTT releases, future releases, and Malayalam genre shelves.</p>
+          <p id="catalog-copy">New releases, OTT releases, future releases, and genre shelves.</p>
         </article>
         <article class="card">
           <h2>Behavior</h2>

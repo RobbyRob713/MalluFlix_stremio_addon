@@ -17,6 +17,11 @@ export interface LandingPageConfig {
   local: InstallTarget;
   hosted: InstallTarget;
   browserDebug: BrowserDebugTarget | null;
+  addon: {
+    name: string;
+    contentLabel: string;
+    description: string;
+  };
 }
 
 const LOCALHOST_HOST = "127.0.0.1";
@@ -120,7 +125,12 @@ export function buildLandingPageConfig(
           manifestUrl: browserManifestUrl,
           note: "This request came from a LAN HTTP address. It is useful for browser checks, not recommended for Stremio installs."
         }
-      : null
+      : null,
+    addon: {
+      name: "MovieFlix",
+      contentLabel: "Movie",
+      description: "Metadata-only movie catalog addon for Stremio."
+    }
   };
 }
 

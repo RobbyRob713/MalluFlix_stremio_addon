@@ -1,17 +1,19 @@
 import type { Manifest } from "stremio-addon-sdk";
 
-import { GENRE_MAP, slugifyGenre } from "./constants";
+import type { AppConfig } from "../config";
+import { GENRE_MAP, buildCatalogId, buildGenreCatalogId } from "./constants";
 
-export function createManifest(baseUrl?: string): Manifest {
+export function createManifest(config: AppConfig): Manifest {
+  const { addon, baseUrl } = config;
   const logo = baseUrl
     ? `${baseUrl}/images/logo.jpg`
     : "https://forzayt.github.io/MalluFlix_stremio_addon/images/logo.jpg";
 
   return {
-    id: "org.mallu.flix",
+    id: addon.id,
     version: "4.0.0",
-    name: "MalluFlix",
-    description: "Metadata-only Malayalam movie catalogs powered by TMDB and Cinemeta.",
+    name: addon.name,
+    description: addon.description,
     logo,
     background: logo,
     resources: ["catalog", "meta"],
@@ -19,26 +21,26 @@ export function createManifest(baseUrl?: string): Manifest {
     catalogs: [
       {
         type: "movie",
-        id: "malluflix_catalog",
-        name: "MalluFlix New Releases",
+        id: buildCatalogId(addon.key, "catalog"),
+        name: `${addon.name} New Releases`,
         extra: [{ name: "skip" }]
       },
       {
         type: "movie",
-        id: "malluflix_ott",
-        name: "MalluFlix OTT Released",
+        id: buildCatalogId(addon.key, "ott"),
+        name: `${addon.name} OTT Released`,
         extra: [{ name: "skip" }]
       },
       {
         type: "movie",
-        id: "malluflix_future",
-        name: "MalluFlix Future Releases",
+        id: buildCatalogId(addon.key, "future"),
+        name: `${addon.name} Future Releases`,
         extra: [{ name: "skip" }]
       },
       ...Object.keys(GENRE_MAP).map((name) => ({
         type: "movie",
-        id: `malluflix_genre_${slugifyGenre(name)}`,
-        name: `MalluFlix ${name}`,
+        id: buildGenreCatalogId(addon.key, name),
+        name: `${addon.name} ${name}`,
         extra: [{ name: "skip" }]
       }))
     ],

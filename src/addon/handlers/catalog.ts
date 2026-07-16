@@ -1,5 +1,5 @@
-import type { CatalogId } from "../constants";
-import { isCatalogId } from "../constants";
+import { parseCatalogId } from "../constants";
+import type { AddonConfig } from "../../config";
 import type { Logger } from "../../lib/logger";
 import type { TmdbService } from "../../services/tmdb";
 
@@ -11,9 +11,15 @@ interface CatalogArgs {
   };
 }
 
-export function createCatalogHandler(tmdbService: TmdbService, logger: Logger) {
+export function createCatalogHandler(
+  tmdbService: TmdbService,
+  logger: Logger,
+  addonConfig: AddonConfig
+) {
   return async ({ type, id, extra }: CatalogArgs) => {
-    if (type !== "movie" || !isCatalogId(id)) {
+    const parsedCatalog = parseCatalogId(id, addonConfig.key);
+
+    if (type !== "movie" || !parsedCatalog) {
       return { metas: [] };
     }
 
@@ -21,7 +27,7 @@ export function createCatalogHandler(tmdbService: TmdbService, logger: Logger) {
     const normalizedSkip = Number.isFinite(skip) && skip >= 0 ? skip : 0;
 
     try {
-      const metas = await tmdbService.discoverCatalog(id as CatalogId, normalizedSkip);
+      const metas = await tmdbService.discoverCatalog(parsedCatalog, normalizedSkip);
       return { metas };
     } catch (error) {
       logger.error("Catalog lookup failed", {

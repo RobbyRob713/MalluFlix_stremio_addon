@@ -1,7 +1,12 @@
 import axios, { type AxiosInstance } from "axios";
 
-import { TMDB_EXTERNAL_ID_CONCURRENCY, MAX_TMBD_PAGES_PER_REQUEST, TMDB_PAGE_SIZE, getGenreIdFromCatalog, isGenreCatalogId } from "../addon/constants";
-import type { CatalogId } from "../addon/constants";
+import type { AddonConfig } from "../config";
+import {
+  MAX_TMBD_PAGES_PER_REQUEST,
+  TMDB_EXTERNAL_ID_CONCURRENCY,
+  TMDB_PAGE_SIZE,
+  type ParsedCatalogId
+} from "../addon/constants";
 import { TtlCache } from "../lib/cache";
 import { mapWithConcurrency } from "../lib/concurrency";
 import type { Logger } from "../lib/logger";
@@ -42,7 +47,7 @@ export interface DiscoverParams {
   include_adult: false;
   page: number;
   sort_by: string;
-  with_original_language: "ml";
+  with_original_language: string;
   "primary_release_date.lte"?: string;
   "primary_release_date.gte"?: string;
   with_release_type?: string;
@@ -50,16 +55,22 @@ export interface DiscoverParams {
   with_genres?: string;
 }
 
-export function buildDiscoverParams(catalogId: CatalogId, page: number, today: string, apiKey: string): DiscoverParams {
+export function buildDiscoverParams(
+  catalog: ParsedCatalogId,
+  page: number,
+  today: string,
+  apiKey: string,
+  addonConfig: AddonConfig
+): DiscoverParams {
   const params: DiscoverParams = {
     api_key: apiKey,
     include_adult: false,
     page,
     sort_by: "primary_release_date.desc",
-    with_original_language: "ml"
+    with_original_language: addonConfig.contentLanguage
   };
 
-  if (catalogId === "malluflix_ott") {
+  if (catalog.kind === "ott") {
     params["primary_release_date.lte"] = today;
     params.with_release_type = "4|5";
     params.region = "IN";
@@ -67,19 +78,16 @@ export function buildDiscoverParams(catalogId: CatalogId, page: number, today: s
     return params;
   }
 
-  if (catalogId === "malluflix_future") {
+  if (catalog.kind === "future") {
     params["primary_release_date.gte"] = today;
     params.sort_by = "primary_release_date.asc";
     return params;
   }
 
-  if (isGenreCatalogId(catalogId)) {
-    const genreId = getGenreIdFromCatalog(catalogId);
-    if (genreId) {
-      params["primary_release_date.lte"] = today;
-      params.with_genres = String(genreId);
-      return params;
-    }
+  if (catalog.kind === "genre" && catalog.genreId) {
+    params["primary_release_date.lte"] = today;
+    params.with_genres = String(catalog.genreId);
+    return params;
   }
 
   params["primary_release_date.lte"] = today;
@@ -91,6 +99,7 @@ export class TmdbService {
 
   constructor(
     private readonly apiKey: string,
+    private readonly addonConfig: AddonConfig,
     private readonly cache: TtlCache<unknown>,
     private readonly logger: Logger,
     httpClient?: AxiosInstance
@@ -101,7 +110,7 @@ export class TmdbService {
     });
   }
 
-  async discoverCatalog(catalogId: CatalogId, skip = 0): Promise<MetaPreview[]> {
+  async discoverCatalog(catalog: ParsedCatalogId, skip = 0): Promise<MetaPreview[]> {
     const page = Math.floor(skip / TMDB_PAGE_SIZE) + 1;
     const offset = skip % TMDB_PAGE_SIZE;
     const today = new Date().toISOString().slice(0, 10);
@@ -112,7 +121,7 @@ export class TmdbService {
     let totalPages = Infinity;
 
     while (currentPage <= totalPages && fetchedPages < MAX_TMBD_PAGES_PER_REQUEST && collected.length < offset + TMDB_PAGE_SIZE) {
-      const response = await this.fetchDiscoverPage(catalogId, currentPage, today);
+      const response = await this.fetchDiscoverPage(catalog, currentPage, today);
       totalPages = response.total_pages;
       const pageMetas = await this.mapDiscoverResults(response.results);
       collected.push(...pageMetas);
@@ -144,8 +153,8 @@ export class TmdbService {
     }
   }
 
-  private async fetchDiscoverPage(catalogId: CatalogId, page: number, today: string): Promise<TmdbDiscoverResponse> {
-    const params = buildDiscoverParams(catalogId, page, today, this.apiKey);
+  private async fetchDiscoverPage(catalog: ParsedCatalogId, page: number, today: string): Promise<TmdbDiscoverResponse> {
+    const params = buildDiscoverParams(catalog, page, today, this.apiKey, this.addonConfig);
     const cacheKey = `tmdb:discover:${JSON.stringify(params)}`;
 
     return this.cache.getOrSet(cacheKey, async () => {

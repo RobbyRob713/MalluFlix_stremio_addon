@@ -18,7 +18,7 @@ export function createAddonServices(config: AppConfig, logger: Logger): AddonSer
   const cache = new TtlCache<unknown>(config.cacheTtlMs);
 
   return {
-    tmdbService: new TmdbService(config.tmdbApiKey, cache, logger),
+    tmdbService: new TmdbService(config.tmdbApiKey, config.addon, cache, logger),
     cinemetaService: new CinemetaService(cache, logger)
   };
 }
@@ -28,8 +28,8 @@ export function createAddonInterface(
   logger: Logger,
   services: AddonServices = createAddonServices(config, logger)
 ) {
-  const builder = new addonBuilder(createManifest(config.baseUrl));
-  builder.defineCatalogHandler(createCatalogHandler(services.tmdbService, logger));
+  const builder = new addonBuilder(createManifest(config));
+  builder.defineCatalogHandler(createCatalogHandler(services.tmdbService, logger, config.addon));
   builder.defineMetaHandler(createMetaHandler(services.cinemetaService, logger));
   return builder.getInterface();
 }

@@ -64,6 +64,11 @@ export function createApp(
   app.get("/app-config.js", (req, res) => {
     const requestOrigin = resolveRequestOrigin(req.protocol, req.get("host") ?? `127.0.0.1:${config.port}`);
     const appConfig = buildLandingPageConfig(config.port, requestOrigin, config.baseUrl);
+    appConfig.addon = {
+      name: config.addon.name,
+      contentLabel: config.addon.contentLabel,
+      description: config.addon.description
+    };
     res.type("application/javascript");
     res.send(`window.__MALLUFLIX_CONFIG__=${JSON.stringify(appConfig)};`);
   });
@@ -74,7 +79,7 @@ export function createApp(
 
   app.get("/manifest.json", (req, res) => {
     const requestOrigin = resolveRequestOrigin(req.protocol, req.get("host") ?? `127.0.0.1:${config.port}`);
-    res.json(createManifest(resolveManifestAssetBase(requestOrigin, config.baseUrl)));
+    res.json(createManifest({ ...config, baseUrl: resolveManifestAssetBase(requestOrigin, config.baseUrl) }));
   });
 
   app.use("/", getRouter(addonInterface));
@@ -94,7 +99,7 @@ if (require.main === module) {
 
   app.listen(config.port, () => {
     const localUrl = config.baseUrl ?? `http://127.0.0.1:${config.port}`;
-    logger.info("MalluFlix server started", {
+    logger.info(`${config.addon.name} server started`, {
       port: config.port,
       manifestUrl: `${localUrl}/manifest.json`
     });
